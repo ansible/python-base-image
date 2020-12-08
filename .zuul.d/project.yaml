@@ -1,0 +1,13 @@
+---
+- project:
+    check:
+      jobs:
+        - python-base-build-container-image
+    gate:
+      jobs:
+        - python-base-build-container-image
+    post:
+      jobs:
+        - python-base-upload-container-image:
+            vars:
+              upload_container_image_promote: false
