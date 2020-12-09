@@ -11,3 +11,8 @@
         - python-base-upload-container-image:
             vars:
               upload_container_image_promote: false
+    periodic:
+      jobs:
+        - python-base-upload-container-image:
+            vars:
+              upload_container_image_promote: false
