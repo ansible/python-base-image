@@ -18,13 +18,17 @@ FROM quay.io/centos/centos:8
 RUN dnf update -y \
   && dnf install -y epel-release dnf-plugins-core \
   && dnf config-manager --set-disabled epel \
-  && dnf install -y python3-pip \
+  && dnf install -y python38-pip \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
+# NOTE(pabelanger): We do this to allow users to install python36 but not
+# change python3 to python36.
+RUN alternatives --set python3 /usr/bin/python3.8
+
 # Upgrade pip to fix wheel cache for locally built wheels.
 # See https://github.com/pypa/pip/issues/6852
-RUN pip3 install --no-cache-dir -U pip
+RUN pip3.8 install --no-cache-dir -U pip
 
 RUN pip3 install --no-cache-dir dumb-init
 
