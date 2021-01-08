@@ -16,7 +16,7 @@
 FROM quay.io/centos/centos:8
 
 RUN dnf update -y \
-  && dnf install -y epel-release dnf-plugins-core \
+  && dnf install -y epel-release dnf-plugins-core glibc-langpack-en \
   && dnf config-manager --set-disabled epel \
   && dnf config-manager --set-enabled powertools \
   && dnf module enable -y python38-devel \
