@@ -13,14 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM quay.io/centos/centos:8
+ARG CONTAINER_IMAGE=quay.io/centos/centos:8
+
+FROM $CONTAINER_IMAGE
+ARG CONTAINER_IMAGE
+
+RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
+    dnf update -y ; \
+    dnf install -y epel-release dnf-plugins-core ; \
+    dnf config-manager --set-disabled epel ; \
+    dnf config-manager --set-enabled powertools ; \
+    dnf module enable -y python38-devel ; \
+    dnf clean all ; \
+    rm -rf /var/cache/dnf ; \
+  fi
 
 RUN dnf update -y \
-  && dnf install -y epel-release dnf-plugins-core glibc-langpack-en \
-  && dnf config-manager --set-disabled epel \
-  && dnf config-manager --set-enabled powertools \
-  && dnf module enable -y python38-devel \
-  && dnf install -y python38-pip \
+  && dnf install -y glibc-langpack-en python38-pip \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
@@ -28,9 +37,11 @@ RUN dnf update -y \
 # change python3 to python36.
 RUN alternatives --set python3 /usr/bin/python3.8
 
-# Upgrade pip to fix wheel cache for locally built wheels.
-# See https://github.com/pypa/pip/issues/6852
-RUN pip3.8 install --no-cache-dir -U pip
+RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
+    # Upgrade pip to fix wheel cache for locally built wheels.
+    # See https://github.com/pypa/pip/issues/6852
+    pip3.8 install --no-cache-dir -U pip ; \
+  fi
 
 RUN pip3 install --no-cache-dir dumb-init
 
