@@ -3,16 +3,24 @@
     check:
       jobs:
         - python-base-build-container-image
+        - python-base-build-ubi8-container-image
     gate:
       jobs:
         - python-base-build-container-image
+        - python-base-build-ubi8-container-image
     post:
       jobs:
         - python-base-upload-container-image:
             vars:
               upload_container_image_promote: false
+        - python-base-upload-ubi8-container-image:
+            vars:
+              upload_container_image_promote: false
     periodic:
       jobs:
         - python-base-upload-container-image:
+            vars:
+              upload_container_image_promote: false
+        - python-base-upload-ubi8-container-image:
             vars:
               upload_container_image_promote: false
