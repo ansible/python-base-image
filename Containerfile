@@ -37,11 +37,9 @@ RUN dnf update -y \
 # change python3 to python36.
 RUN alternatives --set python3 /usr/bin/python3.8
 
-RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
-    # Upgrade pip to fix wheel cache for locally built wheels.
-    # See https://github.com/pypa/pip/issues/6852
-    pip3.8 install --no-cache-dir -U pip ; \
-  fi
+# Upgrade pip to fix wheel cache for locally built wheels.
+# See https://github.com/pypa/pip/issues/6852
+RUN python3 -m pip install --no-cache-dir -U pip
 
 RUN pip3 install --no-cache-dir dumb-init
 
