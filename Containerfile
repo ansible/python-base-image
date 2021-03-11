@@ -41,6 +41,7 @@ RUN alternatives --set python3 /usr/bin/python3.8
 # See https://github.com/pypa/pip/issues/6852
 RUN python3 -m pip install --no-cache-dir -U pip
 
-RUN pip3 install --no-cache-dir dumb-init
+COPY requirements.txt /tmp/src/
+RUN pip3 install --no-cache-dir -r /tmp/src/requirements.txt
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
