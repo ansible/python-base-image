@@ -14,9 +14,16 @@
 # limitations under the License.
 
 ARG CONTAINER_IMAGE=quay.io/centos/centos:8
+ARG REMOTE_SOURCE=.
+ARG REMOTE_SOURCE_DIR=/remote-source
 
 FROM $CONTAINER_IMAGE
+# ============================================================================
 ARG CONTAINER_IMAGE
+ARG REMOTE_SOURCE_DIR
+
+COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
+WORKDIR $REMOTE_SOURCE_DIR/app
 
 RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
     dnf update -y ; \
@@ -41,7 +48,14 @@ RUN alternatives --set python3 /usr/bin/python3.8
 # See https://github.com/pypa/pip/issues/6852
 RUN python3 -m pip install --no-cache-dir -U pip
 
-COPY requirements.txt /tmp/src/
-RUN pip3 install --no-cache-dir -r /tmp/src/requirements.txt
+RUN dnf update -y \
+  && dnf install -y gcc \
+  && pip3 install dumb-init --no-cache-dir -c constraints.txt \
+  && dnf remove -y gcc \
+  && dnf clean all \
+  && rm -rf /var/cache/dnf
+
+WORKDIR /
+RUN rm -rf $REMOTE_SOURCE_DIR
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
