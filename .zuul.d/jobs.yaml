@@ -17,33 +17,9 @@
       docker_images: *container_images
 
 - job:
-    name: python-base-build-ubi8-container-image
-    parent: ansible-build-container-image
-    description: Build python-base ubi8 container image
-    provides: python-base-ubi8-container-image
-    vars: &vars_ubi8
-      container_images: &container_images_ubi8
-        - context: .
-          build_args:
-            - CONTAINER_IMAGE=registry.access.redhat.com/ubi8:latest
-          container_filename: Containerfile
-          registry: quay.io
-          repository: quay.io/ansible/python-base
-          tags: ['ubi8']
-      docker_images: *container_images_ubi8
-
-- job:
     name: python-base-upload-container-image
     parent: ansible-upload-container-image
     description: Build python-base container image and upload to quay.io
     timeout: 2700
     provides: python-base-container-image
     vars: *vars
-
-- job:
-    name: python-base-upload-ubi8-container-image
-    parent: ansible-upload-container-image
-    description: Build python-base ubi8 container image and upload to quay.io
-    timeout: 2700
-    provides: python-base-ubi8-container-image
-    vars: *vars_ubi8
