@@ -25,6 +25,8 @@ ARG REMOTE_SOURCE_DIR
 COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
 WORKDIR $REMOTE_SOURCE_DIR/app
 
+RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf
+
 RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
     dnf update -y ; \
     dnf install -y epel-release dnf-plugins-core ; \
