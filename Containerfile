@@ -35,7 +35,7 @@ RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
     dnf config-manager --set-enabled powertools ; \
     dnf module enable -y python38-devel ; \
     dnf clean all ; \
-    rm -rf /var/cache/dnf ; \
+    rm -rf /var/cache/{dnf,yum} ; \
     rm -rf /var/lib/dnf/history.* ; \
     rm -rf /var/log/* ; \
   fi
@@ -43,7 +43,7 @@ RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
 RUN dnf update -y \
   && dnf install -y glibc-langpack-en python38-pip \
   && dnf clean all \
-  && rm -rf /var/cache/dnf \
+  && rm -rf /var/cache/{dnf,yum} \
   && rm -rf /var/lib/dnf/history.* \
   && rm -rf /var/log/*
 
@@ -60,7 +60,7 @@ RUN dnf update -y \
   && pip3 install dumb-init --no-cache-dir -c constraints.txt \
   && dnf remove -y gcc \
   && dnf clean all \
-  && rm -rf /var/cache/dnf \
+  && rm -rf /var/cache/{dnf,yum} \
   && rm -rf /var/lib/dnf/history.* \
   && rm -rf /var/log/*
 
