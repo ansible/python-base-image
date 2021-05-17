@@ -17,13 +17,9 @@ ARG CONTAINER_IMAGE=quay.io/centos/centos:8
 ARG REMOTE_SOURCE=.
 ARG REMOTE_SOURCE_DIR=/remote-source
 
-FROM $CONTAINER_IMAGE
+FROM $CONTAINER_IMAGE as base
 # ============================================================================
 ARG CONTAINER_IMAGE
-ARG REMOTE_SOURCE_DIR
-
-COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
-WORKDIR $REMOTE_SOURCE_DIR/app
 
 RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf \
     && echo "tsflags=nodocs" >> /etc/dnf/dnf.conf
@@ -55,16 +51,27 @@ RUN alternatives --set python3 /usr/bin/python3.8
 # See https://github.com/pypa/pip/issues/6852
 RUN python3 -m pip install --no-cache-dir -U pip
 
+FROM base as builder
+# ============================================================================
+ARG REMOTE_SOURCE_DIR
+
+COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
+WORKDIR $REMOTE_SOURCE_DIR/app
+
 RUN dnf update -y \
   && dnf install -y gcc \
-  && pip3 install dumb-init --no-cache-dir -c constraints.txt \
+  && pip3 install dumb-init --cache-dir=/output/wheels -c constraints.txt \
+  && cp constraints.txt /output \
   && dnf remove -y gcc \
   && dnf clean all \
   && rm -rf /var/cache/{dnf,yum} \
   && rm -rf /var/lib/dnf/history.* \
   && rm -rf /var/log/*
 
-WORKDIR /
-RUN rm -rf $REMOTE_SOURCE_DIR
+FROM base
+# ============================================================================
+COPY --from=builder /output /output
+RUN pip3 install dumb-init --cache-dir=/output/wheels -c /output/constraints.txt \
+  && rm -rf /output
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
