@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG CONTAINER_IMAGE=quay.io/centos/centos:8
+ARG CONTAINER_IMAGE=quay.io/centos/centos:stream8
 ARG REMOTE_SOURCE=.
 ARG REMOTE_SOURCE_DIR=/remote-source
 
