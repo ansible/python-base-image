@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG CONTAINER_IMAGE=quay.io/centos/centos:stream8
+ARG CONTAINER_IMAGE=quay.io/centos/centos:stream9
 ARG REMOTE_SOURCE=.
 ARG REMOTE_SOURCE_DIR=/remote-source
 
@@ -32,8 +32,6 @@ RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
     dnf update -y ; \
     dnf install -y epel-release dnf-plugins-core ; \
     dnf config-manager --set-disabled epel ; \
-    dnf config-manager --set-enabled powertools ; \
-    dnf module enable -y python38-devel ; \
     dnf clean all ; \
     rm -rf /var/cache/{dnf,yum} ; \
     rm -rf /var/lib/dnf/history.* ; \
@@ -41,19 +39,11 @@ RUN if [[ "$CONTAINER_IMAGE" =~ "centos" ]] ; then \
   fi
 
 RUN dnf update -y \
-  && dnf install -y glibc-langpack-en python38-pip \
+  && dnf install -y glibc-langpack-en python3-pip \
   && dnf clean all \
   && rm -rf /var/cache/{dnf,yum} \
   && rm -rf /var/lib/dnf/history.* \
   && rm -rf /var/log/*
-
-# NOTE(pabelanger): We do this to allow users to install python36 but not
-# change python3 to python36.
-RUN alternatives --set python3 /usr/bin/python3.8
-
-# Upgrade pip to fix wheel cache for locally built wheels.
-# See https://github.com/pypa/pip/issues/6852
-RUN python3 -m pip install --no-cache-dir -U pip
 
 RUN dnf update -y \
   && dnf install -y gcc \
